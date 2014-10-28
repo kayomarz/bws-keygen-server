@@ -15,3 +15,10 @@ For convenience, following are the curl commands to access the API
     curl -X PUT -d "" localhost:4567/key/123abc/unblock
     curl -X PUT -d "" localhost:4567/key/123abc/keepalive
     curl -X DELETE localhost:4567/key/123abc
+
+## Changes
+
+### Tue Oct 28 17:54:32 IST 2014
+
+ - Added rspec tests
+ - bugfixes

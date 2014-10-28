@@ -28,76 +28,102 @@ class KeyList
 
     @watcher.mutex.unlock
     puts debug
+    true
   end
 
   def get
     @watcher.mutex.lock
-
-    return nil if (@keys_unblocked.size == 0)
-    key = @keys_unblocked.delete_at(rand(@keys_unblocked.size))
-    _block(key)
-    puts "get: #{key}"
-    puts debug
-
+    ret = if (@keys_unblocked.size == 0)
+            nil 
+          else
+            key = @keys_unblocked.delete_at(rand(@keys_unblocked.size))
+            if (!@keys_all.include?(key))
+              nil
+            else
+              _block(key)
+              puts "get: #{key}"
+              puts debug
+              key
+            end
+          end
     @watcher.mutex.unlock
-    key
+    ret
   end
   
   def unblock(key)
     puts "Try to unblock #{key}"
     @watcher.mutex.lock
+
     keyObj = @keys_all[key]
-    if (keyObj == nil)
-      puts "Unblock: no such key"
-      return nil
-    end
-    keyObj.unblock
-    @keys_unblocked << key
+    ret = if (keyObj == nil)
+            puts "Unblock: no such key"
+            nil
+          else
+            keyObj.unblock
+            @keys_unblocked << key
+            key
+          end
 
     @watcher.mutex.unlock
     puts debug
-    key
+    ret
   end
 
   def delete(key, msg_suffix="")
     @watcher.mutex.lock
 
     keyObj = @keys_all[key]
-    if (keyObj == nil)
-      puts "Delete: no such key #{key} " << msg_suffix
-      return nil
-    end
-    _delete(key)
-
+    ret = if (keyObj == nil)
+            puts "Delete: no such key #{key} " << msg_suffix
+            nil
+          else
+            # _delete(key)
+            @keys_all.delete(key)
+            keyObj.val
+          end
+    
     @watcher.mutex.unlock
     puts debug
-    keyObj.val
+    ret
   end
 
-  def _delete(key)
-    @watcher.mutex.lock
-    @keys_all.delete(key)
-    # The watch/monitor thread will take care of deleting from unblocked_keys
-    @watcher.mutex.unlock
-  end
+  # def _delete(key)
+  #   @watcher.mutex.lock
+  #   @keys_all.delete(key)
+  #   # The watch/monitor thread will take care of deleting from unblocked_keys
+  #   @watcher.mutex.unlock
+  # end
 
   def keepalive(key)
     @watcher.mutex.lock
 
     keyObj = @keys_all[key]
-    return nil if (keyObj == nil)
-    keyObj.refresh if (keyObj)
-    puts "Refresh #{keyObj}"
+    ret = if (keyObj == nil)
+            nil 
+          else
+            keyObj.refresh if (keyObj)
+            puts "Refresh #{keyObj}"
+            keyObj.val
+          end
 
     @watcher.mutex.unlock
     puts debug
-    keyObj.val
+    ret
   end
 
   def debug
     "Debug:\n" <<
       "@keys_all: " << JSON.pretty_generate(@keys_all) << "\n" <<
       "@keys_unblocked: " << JSON.pretty_generate(@keys_unblocked)
+  end
+
+  def debug_reset
+    puts "debug_reset" 
+    @watcher.mutex.lock
+    @keys_all = {}
+    @keys_unblocked = []
+    @watcher.mutex.unlock
+    "@keys_all: #{@keys_all.inspect}, @keys_unblocked #{@keys_unblocked}"
   end
 
   private

@@ -70,9 +70,9 @@ end
 keyUtil = KeyList.new
 
 # For convenience during dev, populate initial data to get started.
-keyUtil.generate
-keyUtil.generate
-keyUtil.generate
+# keyUtil.generate
+# keyUtil.generate
+# keyUtil.generate
 
 # E1. Generate
 post '/key' do
@@ -95,13 +95,20 @@ end
 # E4. Delete
 delete '/key/:key' do
   key = keyUtil.delete(params[:key])
-  key ? [200, ""] : [404, "No such resource"]
+  key ? [200, key] : [404, "No such resource"]
 end
 
 # E5. Keep alive a key
 put '/key/:key/keepalive' do
   key = keyUtil.keepalive(params[:key])
   key ? [200, ""] : [404, "No such resource"]
+end
+
+
+# E5. Keep alive a key
+put '/debugreset' do
+  sizeStr = keyUtil.debug_reset
+  [200, sizeStr]
 end
 
 # Only for debugging: Dump data

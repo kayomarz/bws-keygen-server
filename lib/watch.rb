@@ -5,7 +5,7 @@ class Watch
   attr_reader :mutex
 
   # MSECS = Milli seconds
-  MONITOR_INTERVAL_MSECS = 1 * 1000
+  MONITOR_INTERVAL_MSECS = 10 * 1000
 
   def initialize(key_list)
     @key_list = key_list
