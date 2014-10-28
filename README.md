@@ -2,9 +2,13 @@
 
  + Ruby 1.9.3
 
-## How to run the server
+## Running the server
 
-    ruby server.js
+    ruby server.rb
+
+## Running the tests
+
+    rspec server_spec.rb
 
 ## Commands
 
@@ -18,7 +22,7 @@ For convenience, following are the curl commands to access the API
 
 ## Changes
 
-### Tue Oct 28 17:54:32 IST 2014
+#### Tue Oct 28 17:54:32 IST 2014
 
  - Added rspec tests
  - bugfixes
